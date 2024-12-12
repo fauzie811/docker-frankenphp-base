@@ -28,7 +28,7 @@ jobs:
         context: .
         push: true
         platforms: linux/amd64,linux/arm64 #,linux/arm/v7
-        tags: fadlee/php-base:latest
+        tags: fauzie811/frankenphp-base:latest
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
