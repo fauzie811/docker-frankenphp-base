@@ -1,4 +1,5 @@
-FROM dunglas/frankenphp:php8.2-alpine
+ARG PHP_VERSION=8.4
+FROM dunglas/frankenphp:php${PHP_VERSION}-alpine
 
 # Install system dependencies
 RUN apk update && apk add --no-cache dcron busybox-suid libcap curl zip unzip git

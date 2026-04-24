@@ -8,6 +8,13 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php_version:
+          - "8.2"
+          - "8.3"
+          - "8.4"
 
     steps:
     - name: Checkout code
@@ -22,13 +29,25 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+    - name: Set image tags
+      id: vars
+      run: |
+        if [ "${{ matrix.php_version }}" = "8.4" ]; then
+          echo "tags=fauzie811/frankenphp-base:${{ matrix.php_version }},fauzie811/frankenphp-base:latest" >> "$GITHUB_OUTPUT"
+        else
+          echo "tags=fauzie811/frankenphp-base:${{ matrix.php_version }}" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Build and push Docker image
+      id: docker_build
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
         platforms: linux/amd64,linux/arm64 #,linux/arm/v7
-        tags: fauzie811/frankenphp-base:latest
+        build-args: |
+          PHP_VERSION=${{ matrix.php_version }}
+        tags: ${{ steps.vars.outputs.tags }}
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
